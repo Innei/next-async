@@ -1,3 +1,4 @@
+import type { CoAction } from './interface.js'
 import { Runner } from './runner.js'
 
 export class Co<
@@ -11,7 +12,7 @@ export class Co<
     this.ctx = ctx ?? ({} as any)
   }
 
-  use(...actions: ((...args: Args) => void)[]) {
+  use(...actions: CoAction<Args>[]) {
     for (let i = 0; i < actions.length; i++) {
       this.queue.push(
         new Runner({
