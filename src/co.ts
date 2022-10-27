@@ -1,4 +1,4 @@
-import type { CoAction } from './interface.js'
+import type { CoAction, CoOptions } from './interface.js'
 import { Runner } from './runner.js'
 
 export class Co<
@@ -7,7 +7,15 @@ export class Co<
 > {
   private queue: Runner<Args, Ctx>[] = []
   private ctx: Ctx
-  constructor(ctx?: Ctx) {
+
+  private options: CoOptions = null!
+  constructor(ctx?: Ctx, options?: Partial<CoOptions>) {
+    const { automaticNext = false } = options || {}
+
+    this.options = {
+      automaticNext,
+    }
+
     this.queue = []
     this.ctx = ctx ?? ({} as any)
   }
@@ -33,9 +41,18 @@ export class Co<
   }
 
   start(...args: Args) {
-    const runner = this.queue[0]
-    if (runner) {
-      return runner.run(args)
+    if (this.options.automaticNext) {
+      for (const runner of this.queue) {
+        if (runner.checkIsRunned()) {
+          continue
+        }
+        runner.run(args)
+      }
+    } else {
+      const runner = this.queue[0]
+      if (runner) {
+        return runner.run(args)
+      }
     }
   }
 }

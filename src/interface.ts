@@ -11,3 +11,7 @@ export type CoAction<Args extends any[]> = (
   this: CoCallerAction,
   ...args: Args
 ) => void
+
+export interface CoOptions {
+  automaticNext: boolean
+}
