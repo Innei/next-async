@@ -1,3 +1,12 @@
+## [0.2.1](https://github.com/Innei/next-async/compare/v0.2.0...v0.2.1) (2022-10-29)
+
+
+### Bug Fixes
+
+* error catch and 100% coverage ([c19f75d](https://github.com/Innei/next-async/commit/c19f75d5eef2513e82e49a3a182b3ef02e948c29))
+
+
+
 # [0.2.0](https://github.com/Innei/next-async/compare/v0.1.1...v0.2.0) (2022-10-29)
 
 
