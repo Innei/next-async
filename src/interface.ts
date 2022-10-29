@@ -7,8 +7,8 @@ export type Caller<
   Ctx extends Record<string, any> = {},
 > = (this: CoCallerAction & Ctx, ...args: Args) => void | Promise<void>
 
-export type CoAction<Args extends any[]> = (
-  this: CoCallerAction,
+export type CoAction<Args extends any[], Ctx = {}> = (
+  this: CoCallerAction & Ctx,
   ...args: Args
 ) => void
 

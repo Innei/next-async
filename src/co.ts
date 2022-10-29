@@ -1,5 +1,6 @@
 import type { CoAction, CoOptions } from './interface.js'
 import { Runner } from './runner.js'
+import { isPromise } from './utils.js'
 
 export class Co<
   Args extends any[] = any[],
@@ -20,7 +21,7 @@ export class Co<
     this.ctx = ctx ?? ({} as any)
   }
 
-  use(...actions: CoAction<Args>[]) {
+  use(...actions: CoAction<Args, Ctx>[]) {
     for (let i = 0; i < actions.length; i++) {
       this.queue.push(
         new Runner({
@@ -38,15 +39,32 @@ export class Co<
         currentRunner.setNextSibling(nextRunner)
       }
     }
+
+    return this
   }
 
-  start(...args: Args) {
+  async start(...args: Args) {
     if (this.options.automaticNext) {
-      for (const runner of this.queue) {
-        if (runner.checkIsRunned()) {
-          continue
+      const isAllRunnerSync = this.queue.every((runner) => !runner.isAsync())
+
+      if (isAllRunnerSync) {
+        for (const runner of this.queue) {
+          if (runner.checkIsRunned()) {
+            continue
+          }
+
+          runner.run(args)
         }
-        runner.run(args)
+      } else {
+        for await (const runner of this.queue) {
+          if (runner.checkIsRunned()) {
+            continue
+          }
+
+          const result = runner.run(args)
+
+          isPromise(result) ? await result : result
+        }
       }
     } else {
       const runner = this.queue[0]

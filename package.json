@@ -1,7 +1,7 @@
 {
   "name": "@innei/next-async",
   "version": "0.1.1",
-  "description": "TODO",
+  "description": "A simple implementation of koa middleware.",
   "author": "Innei",
   "license": "MIT",
   "main": "dist/index.cjs",
@@ -59,7 +59,6 @@
     "package": "NODE_ENV=production npm run build && rollup -c",
     "prepackage": "rm -rf dist",
     "test": "vitest",
-    "dev": "vite",
     "prepare": "husky install"
   },
   "devDependencies": {

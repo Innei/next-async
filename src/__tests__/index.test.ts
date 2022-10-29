@@ -55,6 +55,23 @@ describe('Co', () => {
 
     expect(arr).toEqual([])
   })
+
+  it('should get modified data', () => {
+    const co = new Co<number[]>({
+      data: [],
+    })
+    co.use(
+      function () {
+        this.next()
+        expect(this.data).toEqual([1])
+      },
+      function () {
+        this.data.push(1)
+        this.next()
+        expect(this.data).toEqual([1])
+      },
+    ).start()
+  })
 })
 
 describe('Co automatically next', () => {
@@ -94,7 +111,7 @@ describe('Co automatically next', () => {
     expect(arr).toEqual([])
   })
 
-  test('should run only once', () => {
+  test('should run only once', async () => {
     const co = new Co<any[]>(undefined, { automaticNext: true })
 
     co.use(middleware3, middleware2, middleware1)
@@ -103,5 +120,49 @@ describe('Co automatically next', () => {
     expect(arr).toEqual([2, 1])
   })
 
-  // TODO promise and async function
+  test('async run', async () => {
+    const co = new Co<any[]>(undefined, { automaticNext: false })
+
+    co.use(
+      async function () {
+        await new Promise((resolve) => setTimeout(resolve, 100))
+        arr.push(2)
+        this.next()
+      },
+      function (arr) {
+        arr.push(1)
+        this.next()
+      },
+    )
+
+    const arr: any[] = []
+    await co.start(arr)
+
+    expect(arr).toEqual([2, 1])
+  })
+
+  test('async run no await', async () => {
+    const co = new Co<any[]>(undefined, { automaticNext: true })
+
+    co.use(
+      async function () {
+        await 1
+
+        this.next()
+      },
+      async function () {
+        this.next()
+      },
+      function (arr) {
+        arr.push(1)
+
+        this.next()
+      },
+    )
+
+    const arr: any[] = []
+
+    await co.start(arr)
+    expect(arr).toEqual([1])
+  })
 })

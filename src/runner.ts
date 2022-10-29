@@ -1,5 +1,6 @@
 import { CoAbortError } from './error.js'
 import type { Caller, CoCallerAction } from './interface.js'
+import { isAsyncFunction } from './utils.js'
 
 export class Runner<
   Args extends any[] = any[],
@@ -30,6 +31,10 @@ export class Runner<
 
   public setNextSibling(runner: Runner<Args, Ctx>) {
     this.nextSibling = runner
+  }
+
+  public isAsync() {
+    return isAsyncFunction(this.caller)
   }
 
   public run(args: Args) {
