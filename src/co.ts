@@ -1,7 +1,6 @@
-import { CoAbortError, CoSyncError } from './error.js'
+import { CoSyncError } from './error.js'
 import type { CoAction, CoOptions } from './interface.js'
 import { Runner } from './runner.js'
-import { isPromise } from './utils.js'
 
 export class Co<
   Args extends any[] = any[],
@@ -30,6 +29,7 @@ export class Co<
           nextSibling: null,
           caller: actions[i],
           ctx: this.ctx,
+          cae: this.options.catchAbortError,
         }),
       )
     }
@@ -51,76 +51,59 @@ export class Co<
       throw new CoSyncError()
     }
     if (!this.options.automaticNext) {
-      this.queue[0]?.run(args)
+      this.queue[0]?.runSync(args)
       return
     }
 
-    try {
-      for (const runner of this.queue) {
-        if (runner.checkIsRunned()) {
-          continue
-        }
+    let prevRunner = null as Runner<Args, Ctx> | null
 
-        runner.run(args)
+    for (const runner of this.queue) {
+      if (runner.checkIsRunned()) {
+        continue
       }
-    } catch (err) {
-      this.shouldThrowError(err)
+      if (prevRunner?.isAbort) {
+        break
+      }
+
+      runner.runSync(args)
+      prevRunner = runner
     }
   }
 
   async start(...args: Args) {
+    try {
+      this.startSync(...args)
+      return
+    } catch (err) {
+      if (!(err instanceof CoSyncError)) {
+        throw err
+      }
+    }
+
     if (this.options.automaticNext) {
-      try {
-        this.startSync(...args)
-      } catch (err) {
-        if (err instanceof CoSyncError) {
-          const runAsync = async () => {
-            for await (const runner of this.queue) {
-              if (runner.checkIsRunned()) {
-                continue
-              }
-              try {
-                const result = runner.run(args)
-
-                isPromise(result)
-                  ? await result.catch(this.shouldThrowError)
-                  : result
-              } catch (err) {
-                this.shouldThrowError(err)
-              }
-            }
+      const runAsync = async () => {
+        // TODO refactor
+        let prevRunner = null as Runner<Args, Ctx> | null
+        for await (const runner of this.queue) {
+          if (runner.checkIsRunned()) {
+            continue
           }
 
-          try {
-            await runAsync()
-          } catch (err) {
-            this.shouldThrowError(err)
+          if (prevRunner?.isAbort) {
+            break
           }
-        } else {
-          throw err
+
+          runner.isAsync() ? await runner.run(args) : runner.runSync(args)
+          prevRunner = runner
         }
       }
+
+      await runAsync()
     } else {
       const runner = this.queue[0]
       if (runner) {
-        try {
-          const result = runner.run(args)
-
-          return isPromise(result)
-            ? result.catch(this.shouldThrowError)
-            : result
-        } catch (err) {
-          this.shouldThrowError(err)
-        }
+        await runner.run(args)
       }
     }
-  }
-
-  private shouldThrowError = (err: any) => {
-    if (this.options.catchAbortError && err instanceof CoAbortError) {
-      return
-    }
-
-    throw err
   }
 }

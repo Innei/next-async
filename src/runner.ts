@@ -1,6 +1,6 @@
 import { CoAbortError } from './error.js'
 import type { Caller, CoCallerAction } from './interface.js'
-import { isAsyncFunction } from './utils.js'
+import { isAsyncFunction, isPromise } from './utils.js'
 
 export class Runner<
   Args extends any[] = any[],
@@ -20,6 +20,10 @@ export class Runner<
     private readonly options: {
       nextSibling: Runner<Args, Ctx> | null
       caller: Caller<Args, Ctx>
+      /**
+       * should catch abort error
+       */
+      cae: boolean
 
       ctx?: Ctx
     },
@@ -37,24 +41,79 @@ export class Runner<
     return isAsyncFunction(this.caller)
   }
 
-  public run(args: Args) {
-    const callerAction: CoCallerAction = {
-      abort() {
-        throw new CoAbortError()
-      },
-      next: () => {
-        if (this.nextSibling) {
-          return this.nextSibling.run(args)
-        }
-      },
+  public runSync(args: Args): void {
+    const [callerAction, checkToThrow] = this.getCallerAction(args)
+
+    try {
+      const result = this.caller.call(
+        Object.assign({}, callerAction, this.ctx),
+        ...args,
+      ) as void
+
+      return result
+    } catch (err) {
+      checkToThrow(err)
+    } finally {
+      this.isRunned = true
     }
-
-    const result = this.caller.call(
-      Object.assign({}, callerAction, this.ctx),
-      ...args,
-    )
-    this.isRunned = true
-
-    return result
   }
+
+  public isAbort = false
+
+  private getCallerAction(args: Args) {
+    const cae = this.options.cae
+    const checkToThrow = shouldThrowError.bind(null, cae, () => {
+      this.isAbort = true
+    })
+
+    return [
+      {
+        abort() {
+          throw new CoAbortError()
+        },
+        next: () => {
+          if (this.isAbort) {
+            return
+          }
+          if (this.nextSibling) {
+            try {
+              const result = this.nextSibling.run(args)
+              isPromise(result) && result.catch(checkToThrow)
+            } catch (err) {
+              checkToThrow(err)
+            }
+          }
+        },
+      } as CoCallerAction,
+      checkToThrow,
+    ] as const
+  }
+
+  public async run(args: Args) {
+    const [callerAction, checkToThrow] = this.getCallerAction(args)
+
+    try {
+      const result = this.caller.call(
+        Object.assign({}, callerAction, this.ctx),
+        ...args,
+      )
+
+      this.isRunned = true
+      isPromise(result) && (await result.catch(checkToThrow))
+      return result
+    } catch (err) {
+      checkToThrow(err)
+    } finally {
+      this.isRunned = true
+    }
+  }
+}
+
+const shouldThrowError = (cae: boolean, cb: any, err: any) => {
+  if (cae && err instanceof CoAbortError) {
+    cb()
+    return
+  }
+
+  throw err
 }

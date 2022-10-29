@@ -113,7 +113,7 @@ describe('Co', () => {
   test('should abort and without catch error single', async () => {
     const co = new Co<any[][]>(
       {},
-      { catchAbortError: false, automaticNext: false },
+      { catchAbortError: false, automaticNext: true },
     )
 
     await expect(() =>
@@ -138,6 +138,55 @@ describe('Co', () => {
         })
         .start(),
     ).rejects.toThrowError(CoAbortError)
+  })
+
+  test('should abort and without catch error sync', async () => {
+    const co = new Co<any[][]>(
+      {},
+      { catchAbortError: true, automaticNext: true },
+    )
+
+    await co
+      .use(
+        async function () {
+          this.next()
+        },
+        async function () {
+          this.abort()
+        },
+      )
+      .start()
+  })
+
+  test('should abort and without catch error sync async', async () => {
+    const co = new Co<any[][]>(
+      {},
+      { catchAbortError: false, automaticNext: true },
+    )
+
+    const fn2 = vi.fn().mockImplementation(async () => {})
+    await expect(
+      co
+        .use(function () {
+          this.abort()
+        }, fn2)
+        .start(),
+    ).rejects.toThrowError(CoAbortError)
+  })
+
+  test('should abort and catch catch error sync async', async () => {
+    const co = new Co<any[][]>(
+      {},
+      { catchAbortError: true, automaticNext: true },
+    )
+
+    const fn2 = vi.fn().mockImplementation(async () => {})
+    await co
+      .use(function () {
+        this.abort()
+      }, fn2)
+      .start()
+    expect(fn2).not.toBeCalled()
   })
 
   test('should abort and without catch error sync start', () => {
