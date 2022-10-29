@@ -1,3 +1,12 @@
+## [0.2.2](https://github.com/Innei/next-async/compare/v0.2.1...v0.2.2) (2022-10-29)
+
+
+### Bug Fixes
+
+* abort cache ([9c33bef](https://github.com/Innei/next-async/commit/9c33befdee833b4b4c64274eaa1f0e998ec7ad27))
+
+
+
 ## [0.2.1](https://github.com/Innei/next-async/compare/v0.2.0...v0.2.1) (2022-10-29)
 
 

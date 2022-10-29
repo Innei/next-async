@@ -1,6 +1,6 @@
 {
   "name": "@innei/next-async",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A simple implementation of koa middleware.",
   "author": "Innei",
   "license": "MIT",
