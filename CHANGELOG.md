@@ -1,3 +1,13 @@
+# [0.2.0](https://github.com/Innei/next-async/compare/v0.1.1...v0.2.0) (2022-10-29)
+
+
+### Features
+
+* add docs and test case ([f9b8bfd](https://github.com/Innei/next-async/commit/f9b8bfdeadbe09e71dae2b7b5c3360307ebf58e9))
+* add options ([803cd73](https://github.com/Innei/next-async/commit/803cd7332a4477fde506907ba8f7442a806c2e9c))
+
+
+
 ## [0.1.1](https://github.com/Innei/next-async/compare/v0.1.0...v0.1.1) (2022-10-26)
 
 
