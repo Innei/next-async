@@ -89,6 +89,7 @@ co.use(
 const co = new Co(ctx, options)
 ```
 
-| Key           | Type    | Default | Description                                       |
-| ------------- | ------- | ------- | ------------------------------------------------- |
-| automaticNext | boolean | false   | Always run next action when this action returned. |
+| Key             | Type    | Default | Description                                       |
+| --------------- | ------- | ------- | ------------------------------------------------- |
+| automaticNext   | boolean | false   | Always run next action when this action returned. |
+| catchAbortError | boolean | true    | Catch CoAbortError or not.                        |

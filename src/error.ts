@@ -1,5 +1,3 @@
-export class CoAbortError extends Error {
-  get [Symbol.toStringTag]() {
-    return 'CoAbortError'
-  }
-}
+export class CoAbortError extends Error {}
+
+export class CoSyncError extends Error {}

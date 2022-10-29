@@ -26,7 +26,7 @@ export class Runner<
   ) {
     this.caller = options.caller
     this.nextSibling = options.nextSibling
-    this.ctx = (options.ctx || {}) as any
+    this.ctx = options.ctx as any
   }
 
   public setNextSibling(runner: Runner<Args, Ctx>) {
@@ -49,24 +49,12 @@ export class Runner<
       },
     }
 
-    try {
-      const result = this.caller.call(
-        Object.assign({}, callerAction, this.ctx),
-        ...args,
-      )
-      this.isRunned = true
-      // if (isPromise(result)) {
-      //   result.then((res) => {
-      //     this.isRunned = true
-      //     return res
-      //   })
-      // }
-      return result
-    } catch (err) {
-      if (err instanceof CoAbortError) {
-        return
-      }
-      throw err
-    }
+    const result = this.caller.call(
+      Object.assign({}, callerAction, this.ctx),
+      ...args,
+    )
+    this.isRunned = true
+
+    return result
   }
 }

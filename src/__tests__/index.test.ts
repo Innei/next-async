@@ -1,4 +1,5 @@
 import { Co } from '../co.js'
+import { CoAbortError, CoSyncError } from '../error.js'
 import type { CoAction } from '../interface.js'
 
 const middleware1: CoAction<any[][]> = function (arr) {
@@ -71,6 +72,90 @@ describe('Co', () => {
         expect(this.data).toEqual([1])
       },
     ).start()
+  })
+
+  test('should abort and without catch error', () => {
+    const co = new Co<any[][]>(
+      {},
+      { catchAbortError: false, automaticNext: true },
+    )
+
+    expect(() =>
+      co
+        .use(
+          () => {},
+          async function () {
+            this.abort()
+          },
+        )
+        .start(),
+    ).rejects.toThrowError(CoAbortError)
+  })
+
+  test('should abort and without catch error sync first', () => {
+    const co = new Co<any[][]>(
+      {},
+      { catchAbortError: false, automaticNext: true },
+    )
+
+    expect(() =>
+      co
+        .use(
+          function () {
+            this.abort()
+          },
+          async () => {},
+        )
+        .start(),
+    ).rejects.toThrowError(CoAbortError)
+  })
+
+  test('should abort and without catch error single', async () => {
+    const co = new Co<any[][]>(
+      {},
+      { catchAbortError: false, automaticNext: false },
+    )
+
+    await expect(() =>
+      co
+        .use(async function () {
+          this.abort()
+        })
+        .start(),
+    ).rejects.toThrowError(CoAbortError)
+  })
+
+  test('should abort and without catch error sync', async () => {
+    const co = new Co<any[][]>(
+      {},
+      { catchAbortError: false, automaticNext: true },
+    )
+
+    await expect(() =>
+      co
+        .use(function () {
+          this.abort()
+        })
+        .start(),
+    ).rejects.toThrowError(CoAbortError)
+  })
+
+  test('should abort and without catch error sync start', () => {
+    const co = new Co<any[][]>({}, { catchAbortError: false })
+
+    expect(() =>
+      co
+        .use(function () {
+          this.abort()
+        })
+        .startSync(),
+    ).toThrowError(CoAbortError)
+  })
+
+  test('should throw CoSyncError if run async actions via call startSync', () => {
+    const co = new Co()
+    co.use(async () => {})
+    expect(() => co.startSync()).toThrowError(CoSyncError)
   })
 })
 

@@ -13,5 +13,12 @@ export type CoAction<Args extends any[], Ctx = {}> = (
 ) => void
 
 export interface CoOptions {
+  /**
+   * @default false
+   */
   automaticNext: boolean
+  /**
+   * @default true
+   */
+  catchAbortError: boolean
 }

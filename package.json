@@ -59,7 +59,8 @@
     "package": "NODE_ENV=production npm run build && rollup -c",
     "prepackage": "rm -rf dist",
     "test": "vitest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@innei/eslint-config-react-ts": "0.9.4",
@@ -70,6 +71,7 @@
     "@rollup/plugin-typescript": "8.5.0",
     "@types/node": "18.7.16",
     "@unocss/preset-wind": "0.45.18",
+    "@vitest/coverage-c8": "0.24.3",
     "esbuild": "0.15.8",
     "gh-pages": "4.0.0",
     "husky": "8.0.1",

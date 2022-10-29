@@ -2,13 +2,13 @@ export const isAsyncFunction = (func: any): boolean => {
   return func && func.constructor && func.constructor.name === 'AsyncFunction'
 }
 
-export const isGeneratorFunction = (func: any): boolean => {
-  return (
-    func && func.constructor && func.constructor.name === 'GeneratorFunction'
-  )
-}
+// export const isGeneratorFunction = (func: any): boolean => {
+//   return (
+//     func && func.constructor && func.constructor.name === 'GeneratorFunction'
+//   )
+// }
 
-export const isPromise = (obj: any): boolean => {
+export const isPromise = (obj: any): obj is Promise<any> => {
   return (
     obj &&
     typeof obj.then === 'function' &&
