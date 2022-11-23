@@ -42,4 +42,25 @@ describe('example', () => {
       .start()
     expect(data).toEqual([1, 2])
   })
+
+  test('e.g. 3', async () => {
+    const data = [] as number[]
+    const co = new Co({ data }, { automaticNext: false, catchAbortError: true })
+    await co
+      .use(
+        async function () {
+          this.abort()
+        },
+        async function () {
+          await this.next()
+          expect(this.data).toEqual([1, 2])
+        },
+        async function () {
+          await 1
+          this.data.push(2)
+        },
+      )
+      .start()
+    expect(data).toEqual([])
+  })
 })

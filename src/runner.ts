@@ -99,8 +99,12 @@ export class Runner<
       )
 
       this.isRunned = true
-      isPromise(result) && (await result.catch(checkToThrow))
-      return result
+      const nextResult =
+        isPromise(result) && (await result.catch(checkToThrow)) === false
+          ? Promise.resolve()
+          : result
+
+      return nextResult
     } catch (err) {
       checkToThrow(err)
     } finally {
@@ -112,7 +116,7 @@ export class Runner<
 const shouldThrowError = (cae: boolean, cb: any, err: any) => {
   if (cae && err instanceof CoAbortError) {
     cb()
-    return
+    return false
   }
 
   throw err
