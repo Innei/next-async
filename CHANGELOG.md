@@ -1,3 +1,14 @@
+# CHANGELOG
+
+## [0.2.3](https://github.com/Innei/next-async/compare/v0.2.2...v0.2.3) (2022-11-23)
+
+
+### Bug Fixes
+
+* async function reject ([f369562](https://github.com/Innei/next-async/commit/f3695628176e5e56d7641f251b4c479b63026a0f))
+
+
+
 ## [0.2.2](https://github.com/Innei/next-async/compare/v0.2.1...v0.2.2) (2022-10-29)
 
 
