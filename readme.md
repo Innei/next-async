@@ -10,7 +10,9 @@ co.use(someMiddlewares)
 await co.start()
 ```
 
-## Using middleware
+## Usage
+
+**Using middleware**
 
 ```ts
 const middleware = function (args) {
@@ -20,7 +22,8 @@ const middleware = function (args) {
 co.use(middleware)
 ```
 
-## Pass context to `Co`
+**Pass context to `Co`**
+
 
 ```ts
 const co = new Co({ data: [] })
@@ -41,7 +44,7 @@ co.use(
 ).start()
 ```
 
-## Use async runner and await next runner done then back
+**Use async runner and await next runner done then back**
 
 ```ts
 const co = new Co({ data: [] })
@@ -65,7 +68,7 @@ await co
   .start()
 ```
 
-## Abort
+**Abort action in flow**
 
 ```ts
 const co = new Co({ data: [] })
@@ -93,3 +96,9 @@ const co = new Co(ctx, options)
 | --------------- | ------- | ------- | ------------------------------------------------- |
 | automaticNext   | boolean | false   | Always run next action when this action returned. |
 | catchAbortError | boolean | true    | Catch CoAbortError or not.                        |
+
+## License
+
+2022 © Innei, Released under the MIT License.
+
+> [Personal Website](https://innei.ren/) · GitHub [@Innei](https://github.com/innei/)
