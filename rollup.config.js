@@ -92,7 +92,7 @@ const config = [
         exclude: /node_modules/,
         sourceMap: false,
         minify: process.env.NODE_ENV === 'production',
-        target: 'es2017',
+        target: 'es2021',
         jsxFactory: 'React.createElement',
         jsxFragment: 'React.Fragment',
         define: {
